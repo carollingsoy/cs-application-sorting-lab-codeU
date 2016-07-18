@@ -64,8 +64,44 @@ public class ListSorter<T> {
 	 */
 	public List<T> mergeSort(List<T> list, Comparator<T> comparator) {
         // FILL THIS IN!
-        return null;
+                int size = list.size();
+                // base case
+                if (size <= 1)
+                    return list;
+
+                // subproblems
+                List<T> first = mergeSort(
+                        new LinkedList<T>(list.subList(0, size/2)), 
+                        comparator);
+                List<T> second = mergeSort(
+                        new LinkedList<T>(list.subList(size/2, size)), 
+                        comparator);
+                
+                // merge
+                List<T> result = new LinkedList<T>();
+                int total = first.size() + second.size();
+                for (int i = 0; i < total; i++) {
+                    List<T> smaller = pickSmaller(first, second, comparator);
+                    result.add(smaller.remove(0));
+                }
+                return result;
 	}
+
+        private List<T> pickSmaller(List<T> first, 
+                                    List<T> second, Comparator<T> comparator) {
+            if (first.size() == 0)
+                return second;
+            if (second.size() == 0)
+                return first;
+
+            int res = comparator.compare(first.get(0), second.get(0));
+            if (res < 0)
+                return first;
+            if (res > 0)
+                return second;
+            return first;
+        }
+
 
 	/**
 	 * Sorts a list using a Comparator object.
@@ -76,6 +112,12 @@ public class ListSorter<T> {
 	 */
 	public void heapSort(List<T> list, Comparator<T> comparator) {
         // FILL THIS IN!
+                PriorityQueue<T> heap = new PriorityQueue<T>(list.size(), comparator);
+                heap.addAll(list);
+                list.clear();
+                while (!heap.isEmpty()) {
+                    list.add(heap.poll());
+                }
 	}
 
 	
@@ -90,7 +132,26 @@ public class ListSorter<T> {
 	 */
 	public List<T> topK(int k, List<T> list, Comparator<T> comparator) {
         // FILL THIS IN!
-        return null;
+                PriorityQueue<T> heap = new PriorityQueue<T>(list.size(), comparator);
+                for (T element: list) {
+                    // add first k elements in list to heap 
+                    if (heap.size() < k) {
+                        heap.offer(element);
+                        continue;
+                    }
+                    // replace min val in heap with next element in list
+                    int cmp = comparator.compare(element, heap.peek());
+                    if (cmp > 0) {
+                        heap.poll();
+                        heap.offer(element);
+                    }
+                }
+                // add heap elements into list in order
+                List<T> topK = new ArrayList<T>();
+                while (!heap.isEmpty()) {
+                    topK.add(heap.poll());
+                }
+                return topK;
 	}
 
 	
